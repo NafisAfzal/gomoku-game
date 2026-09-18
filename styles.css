@@ -1,0 +1,494 @@
+/* Gomoku — aubergine frame, dusty violet playing board, dependency-free. */
+
+* { box-sizing: border-box; margin: 0; }
+
+:root {
+  --bg: #ece4f7;
+  --bg-deep: #d8c9f0;
+  --card: #eee7fc;
+  --card-border: #c9b3ec;
+  --band: #f7f2fe;
+  --band-border: #d8c9f3;
+  --plum: #48254f;
+  --plum-deep: #2f1836;
+  --primary: #4e2a5b;
+  --cta: #3a1f45;
+  --cta-hover: #2b1532;
+  --cta-active: #1f0f24;
+  --ink: #2c2135;
+  --muted: #5c5370;
+  --stone-black: #262228;
+  --stone-white: #fffaf0;
+  --board-face: #7a61ad;
+  --line: #5e488e;
+  --win: #7a5a00;
+  --win-board: #f2c94c;
+  --win-soft: #f6e3ae;
+  --focus: #1d4ed8;
+  --radius: 14px;
+  --shadow-card: 0 10px 24px rgba(72, 37, 79, 0.16);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+  color: var(--ink);
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 16px 28px;
+  line-height: 1.5;
+  overflow-x: clip;
+}
+
+::selection { background: var(--plum); color: #fff; }
+
+/* ---------- One centered column: hero, game, moves, footer ---------- */
+.hero,
+.layout,
+.footer {
+  width: 100%;
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+.hero { text-align: center; padding-block: 2px; }
+
+.hero h1 {
+  font-size: 26px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.hero .sub {
+  margin: 2px auto 0;
+  max-width: 44ch;
+  font-size: 13.5px;
+  color: var(--muted);
+  text-wrap: balance;
+}
+
+/* ---------- Single-column game composition ---------- */
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.game-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ---------- Setup band: instruction, sizes, actions ---------- */
+.setup {
+  width: 100%;
+  background: var(--band);
+  border-bottom: 1px solid var(--band-border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 16px;
+  text-align: center;
+}
+
+.setup-hint {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.size-group {
+  border: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.size-group legend {
+  padding: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.size-options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.size-opt { cursor: pointer; }
+
+.size-opt input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.size-opt span {
+  display: inline-block;
+  min-width: 64px;
+  padding: 7px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  color: var(--primary);
+  background: #fff;
+  border: 2px solid var(--card-border);
+  border-radius: 9px;
+  transition: background 0.12s ease, border-color 0.12s ease, transform 0.1s ease;
+}
+
+.size-opt:hover span { border-color: var(--primary); }
+
+.size-opt input:checked + span {
+  background: var(--plum);
+  border-color: var(--plum-deep);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(47, 24, 54, 0.45);
+}
+
+.size-opt input:focus-visible + span {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.size-opt input:disabled + span {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.size-hint {
+  font-size: 12px;
+  color: var(--muted);
+  max-width: 40ch;
+}
+.size-hint[hidden] { display: none; }
+
+/* ---------- Buttons: charcoal CTA, quiet secondary ---------- */
+.btn {
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.btn.primary {
+  background: var(--cta);
+  border-color: var(--cta);
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 10px 32px;
+  box-shadow: 0 4px 12px rgba(58, 31, 69, 0.38);
+}
+
+.btn.primary:hover { background: var(--cta-hover); border-color: var(--cta-hover); }
+.btn.primary:active { background: var(--cta-active); transform: translateY(1px); }
+.btn.primary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.btn.secondary {
+  background: transparent;
+  border-color: var(--card-border);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 20px;
+}
+
+.btn.secondary:hover:not(:disabled) { background: rgba(78, 42, 91, 0.1); }
+.btn.secondary:active:not(:disabled) { transform: translateY(1px); }
+.btn.secondary:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Idle invitation: slow breathing pulse, stops once a match starts. */
+@keyframes pulse-invite {
+  0%, 100% { transform: scale(1); box-shadow: 0 4px 12px rgba(58, 31, 69, 0.38), 0 0 0 0 rgba(78, 42, 91, 0.35); }
+  50% { transform: scale(1.03); box-shadow: 0 4px 12px rgba(58, 31, 69, 0.38), 0 0 0 8px rgba(78, 42, 91, 0); }
+}
+
+#newBtn.pulse { animation: pulse-invite 2.2s ease-in-out infinite; }
+
+/* ---------- Board: deep-plum frame, violet playing surface ---------- */
+.board-frame {
+  width: 100%;
+  display: flex;
+  justify-content: safe center;
+  background: linear-gradient(180deg, var(--plum) 0%, var(--plum-deep) 100%);
+  padding: 14px;
+}
+
+.board-wrap {
+  position: relative;
+  width: min(100%, 660px);
+  background: var(--board-face);
+  border-radius: 10px;
+  box-shadow: inset 0 0 0 2px var(--plum-deep), 0 4px 14px rgba(35, 16, 42, 0.5);
+  padding: 10px;
+}
+
+/* Desktop height guard: generous board, but never absurd on short viewports. */
+@supports (height: 100svh) {
+  .board-wrap { width: min(100%, 660px, max(420px, calc(100svh - 320px))); }
+}
+
+@supports (height: 100dvh) {
+  .board-wrap { width: min(100%, 660px, max(420px, calc(100dvh - 320px))); }
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(var(--board-size, 15), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--board-size, 15), minmax(0, 1fr));
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+.cell {
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 1 / 1;
+  border: 1px solid var(--line);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+  appearance: none;
+  transition: background 0.12s ease;
+}
+
+.cell:not(:disabled):hover { background: rgba(255, 255, 255, 0.16); }
+.cell:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+.cell:disabled { cursor: default; }
+
+/* Stones — colour class lives on the CELL (.cell.black / .cell.white). */
+.cell .stone {
+  width: 72%;
+  height: 72%;
+  border-radius: 50%;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.cell.black .stone {
+  background: radial-gradient(circle at 35% 30%, #57514c 0%, var(--stone-black) 62%);
+  box-shadow: inset 0 2px 3px rgba(255, 255, 255, 0.2), 0 1px 4px rgba(35, 16, 42, 0.55);
+}
+
+.cell.white .stone {
+  background: radial-gradient(circle at 35% 30%, #ffffff 0%, var(--stone-white) 65%, #e6dcc4 100%);
+  border: 1px solid var(--plum-deep);
+  box-shadow: 0 1px 4px rgba(35, 16, 42, 0.55);
+}
+
+/* Winning cells: bright gold on violet, stones stay visible. */
+.cell.win { z-index: 2; }
+.cell.win::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border: 3px solid var(--win-board);
+  border-radius: 5px;
+  background: rgba(242, 201, 76, 0.16);
+  pointer-events: none;
+}
+
+/* ---------- Status belongs to the board ---------- */
+.status-row {
+  width: 100%;
+  padding: 12px 16px 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 58px;
+  justify-content: center;
+}
+
+.turn { font-size: 14px; color: var(--muted); }
+.turn strong { color: var(--ink); font-weight: 700; }
+
+.turn-idle {
+  display: inline-block;
+  font-weight: 600;
+  color: var(--primary);
+  background: rgba(78, 42, 91, 0.08);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 13px;
+}
+
+.status { font-size: 15px; font-weight: 700; color: var(--primary); min-height: 22px; }
+.status:empty { display: none; }
+.status.is-win { color: var(--win); }
+.status.is-draw { color: var(--muted); }
+
+/* ---------- Win celebration (transient, never covers stones) ---------- */
+.celebration-layer {
+  position: absolute;
+  inset: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.win-toast {
+  background: rgba(46, 26, 54, 0.94);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  padding: 12px 24px;
+  border-radius: 999px;
+  border: 1px solid var(--win-soft);
+  box-shadow: 0 10px 24px rgba(35, 16, 42, 0.5);
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.win-toast.show { opacity: 1; transform: scale(1); }
+
+.spark {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--win-soft);
+  opacity: 0;
+  animation: spark-drift 1.6s ease-out forwards;
+}
+
+@keyframes spark-drift {
+  0% { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--dx, 0px), var(--dy, -60px)) scale(0.2); }
+}
+
+@keyframes stone-in {
+  from { transform: scale(0.6); opacity: 0.4; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes win-ring {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cell .stone { animation: stone-in 0.16s ease-out; }
+  .cell.win::after { animation: win-ring 0.3s ease-out; }
+}
+
+/* ---------- Moves: compact strip below the game ---------- */
+.moves-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  padding: 12px 16px;
+}
+
+.moves-card h2 {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.moves-empty { font-size: 12px; color: var(--muted); }
+
+.moves-card ol {
+  padding-left: 20px;
+  max-height: 128px;
+  overflow-y: auto;
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.moves-card li { margin: 3px 0; }
+.moves-card li:last-child { color: var(--ink); font-weight: 600; }
+
+/* ---------- Footer: centered, quiet ---------- */
+.footer {
+  color: var(--muted);
+  text-align: center;
+  font-size: 12px;
+}
+
+/* ---------- Compact screens: tighter chrome, 3+3 size grid ---------- */
+@media (max-width: 480px) {
+  body { padding: 12px 10px 20px; gap: 10px; }
+  .hero h1 { font-size: 22px; }
+  .hero .sub { font-size: 12.5px; }
+  .setup { padding: 12px 10px 14px; gap: 8px; }
+  .size-options {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+    max-width: 340px;
+  }
+  .size-opt span { min-width: 0; width: 100%; }
+  .board-frame {
+    padding: 10px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+  .board-wrap { padding: 8px; }
+  /* Large boards keep a playable minimum cell (~22px) and scroll
+     inside the frame only — the page itself never scrolls sideways. */
+  .board-wrap[data-size="17"] { min-width: 390px; }
+  .board-wrap[data-size="19"] { min-width: 434px; }
+  .btn.primary { width: min(100%, 300px); }
+  .status-row { min-height: 52px; padding: 10px 12px 14px; }
+}
+
+/* ---------- Reduced motion: keep state, drop decoration ---------- */
+@media (prefers-reduced-motion: reduce) {
+  #newBtn.pulse { animation: none; }
+  .cell .stone { animation: none; }
+  .cell.win::after { animation: none; }
+  .spark { display: none; }
+  .win-toast { transition: none; }
+  * { scroll-behavior: auto; }
+}

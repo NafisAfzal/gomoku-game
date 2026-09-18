@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Gomoku — a local two-player five-in-a-row board game. Place stones and get five in a row to win." />
+  <meta name="theme-color" content="#48254f" />
+  <title>Gomoku — Five in a Row</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="shortcut icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><circle cx=%2212%22 cy=%2212%22 r=%229%22 fill=%22%23232022%22/><circle cx=%2212%22 cy=%2212%22 r=%228%22 fill=%22none%22 stroke=%22%23b8860b%22 stroke-width=%221.5%22/></svg>" />
+</head>
+<body>
+  <header class="hero">
+    <h1>Gomoku</h1>
+    <p class="sub">Five in a row wins. Black moves first.</p>
+  </header>
+
+  <main class="layout">
+    <section class="game-card" aria-label="Gomoku game">
+      <div class="setup" aria-label="Match setup">
+        <p class="setup-hint">Choose a board size, then start a new match.</p>
+        <fieldset class="size-group" id="sizeGroup">
+          <legend>Board size</legend>
+          <div class="size-options">
+            <label class="size-opt"><input type="radio" name="boardSize" value="9" /><span>9 × 9</span></label>
+            <label class="size-opt"><input type="radio" name="boardSize" value="11" /><span>11 × 11</span></label>
+            <label class="size-opt"><input type="radio" name="boardSize" value="13" /><span>13 × 13</span></label>
+            <label class="size-opt"><input type="radio" name="boardSize" value="15" checked /><span>15 × 15</span></label>
+            <label class="size-opt"><input type="radio" name="boardSize" value="17" /><span>17 × 17</span></label>
+            <label class="size-opt"><input type="radio" name="boardSize" value="19" /><span>19 × 19</span></label>
+          </div>
+        </fieldset>
+        <div class="actions">
+          <button id="newBtn" type="button" class="btn primary pulse">New Match</button>
+          <button id="undoBtn" type="button" class="btn secondary" disabled>Undo</button>
+        </div>
+        <p class="size-hint" id="sizeHint" hidden>Finish the current match or start a New Match to change board size.</p>
+      </div>
+
+      <div class="board-frame">
+        <div id="boardWrap" class="board-wrap">
+          <div id="board" class="board" role="grid" aria-label="Gomoku board"></div>
+          <div id="celebrationLayer" class="celebration-layer" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <div class="status-row">
+        <p class="turn turn-idle" id="turnLine">No active match yet.</p>
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section class="moves-card" aria-label="Move history">
+      <h2>Moves</h2>
+      <p class="moves-empty" id="movesEmpty">No moves yet.</p>
+      <ol id="movesList"></ol>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <small>Place stones by clicking cells. Five in a row wins.</small>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
