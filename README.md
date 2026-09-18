@@ -46,7 +46,7 @@ No build step is needed.
 
 ## Live Demo
 
-https://GITHUB_USERNAME.github.io/gomoku-game/
+https://NafisAfzal.github.io/gomoku-game/
 
 ## Tech
 
